@@ -1,5 +1,5 @@
 <?php
-include_once("conn.php");
+include_once("conn_cmt.php");
 
 $project_id = $_GET['project_id'] ?? null;
 
