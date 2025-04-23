@@ -1,8 +1,19 @@
 <?php
-try {
-    $conn = new PDO("mysql:host=localhost;dbname=project_management_system", "root", "");
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
-}
+
+$servername= 'mysql:host=localhost; dbname=project_cmt';
+$username= 'root';
+$password='';
+$dbname='project_cmt';
+
+try{
+$conn = new PDO($servername,$username, $password); 
+   $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); 
+  
+
+  }
+catch(PDOException $e)
+    {
+     echo "Error :" . $e->getMessage();
+    }
+
 ?>
