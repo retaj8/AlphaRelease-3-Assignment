@@ -1,5 +1,5 @@
 <?php
-include ('conn.php');
+include ('conn_cmt.php');
 include ('Project.php');
 
 $project = new Project($conn);
