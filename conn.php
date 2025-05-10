@@ -3,7 +3,6 @@
 $servername= 'mysql:host=localhost; dbname=project_cmt';
 $username= 'root';
 $password='';
-$dbname='project_cmt';
 
 try{
 $conn = new PDO($servername,$username, $password); 
