@@ -25,16 +25,30 @@ public function addProject($projectData, $teamMembers) {
     try {
         $this->db->beginTransaction();
 
-        $sql = "INSERT INTO projects (project_id, project_name, start_date, end_date, status, supervisor, student, team_leader)
-                VALUES (:project_id, :project_name, :start_date, :end_date, :status, :supervisor, :student, :team_leader)";
+        $sql = "INSERT INTO projects (project_code, project_name, start_date, end_date, status, supervisor, student, team_leader)
+                VALUES (:project_code, :project_name, :start_date, :end_date, :status, :supervisor, :student, :team_leader)";
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($projectData);
 
+        $stmt->execute([
+            ':project_code' => $projectData['project_code'],
+            ':project_name' => $projectData['project_name'],
+            ':start_date' => $projectData['start_date'],
+            ':end_date' => $projectData['end_date'],
+            ':status' => $projectData['status'],
+            ':supervisor' => $projectData['supervisor'],
+            ':student' => $projectData['student'],
+            ':team_leader' => $projectData['team_leader']
+        ]);
+
+        // الحصول على رقم المشروع الجديد
+        $projectId = $this->db->lastInsertId();
+
+        // إدخال أعضاء الفريق مع رقم المشروع الجديد
         $sqlMembers = "INSERT INTO project_members (project_id, member_name) VALUES (:project_id, :member_name)";
         $stmtMembers = $this->db->prepare($sqlMembers);
 
         foreach ($teamMembers as $member) {
-            $stmtMembers->execute(['project_id' => $projectData['project_id'], 'member_name' => $member]);
+            $stmtMembers->execute([':project_id' => $projectId, ':member_name' => $member]);
         }
 
         $this->db->commit();
@@ -44,6 +58,7 @@ public function addProject($projectData, $teamMembers) {
         return "خطأ أثناء إضافة المشروع: " . $e->getMessage();
     }
 }
+
     //دالة التحقق اذا كان المشروع موجود مسبقا
     public function isprojectExists($projectId,$projectName){
         $sql="SELECT * FROM projects WHERE project_id=:project_id OR project_name=:project_name";
