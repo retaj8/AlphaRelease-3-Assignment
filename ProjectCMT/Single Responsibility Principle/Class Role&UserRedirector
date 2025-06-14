@@ -1,0 +1,95 @@
+<?php
+class Role {// 1. كلاس Role - مسؤولية واحدة فقط
+
+    private $name;
+    private $permissions;
+    
+    public function __construct($name, array $permissions = []) {
+        $this->name = $name;
+        $this->permissions = $permissions;
+    }
+    
+    public function getName(): string {
+        return $this->name;
+    }
+    
+    public function getPermissions(): array {
+        return $this->permissions;
+    }
+    
+    public function hasPermission(string $permission): bool {
+        return in_array($permission, $this->permissions);
+    }
+    
+    public function isAdmin(): bool {
+        return $this->name === "Admin";
+    }
+    
+    public function isStudent(): bool {
+        return $this->name === "Student";
+    }
+    
+    public function isSupervisor(): bool {
+        return $this->name === "Supervisor";
+    }
+}
+
+// 2. كلاس منفصل للتوجيه
+class UserRedirector {
+    private $redirectMap;
+    
+    public function __construct() {
+        $this->redirectMap = [
+            'Student' => 'student_dashboard.php',
+            'Supervisor' => 'dashboard_supervisor.php',
+            'Admin' => 'admin_dashboard.php',
+            'default' => 'login.php'
+        ];
+    }
+    
+    public function redirect(Role $role): void {
+        $roleName = $role->getName();
+        $destination = $this->redirectMap[$roleName] ?? $this->redirectMap['default'];
+        
+        header("Location: $destination");
+        exit();
+    }
+    
+    public function getRedirectUrl(Role $role): string {
+        $roleName = $role->getName();
+        return $this->redirectMap[$roleName] ?? $this->redirectMap['default'];
+    }
+}
+
+// 3. Factory لإنشاء الأدوار
+class RoleFactory {
+    const ADMIN_PERMISSIONS = [
+        'user_management', 'project_management', 'system_settings', 
+        'reports_access', 'full_access'
+    ];
+    
+    const SUPERVISOR_PERMISSIONS = [
+        'project_management', 'student_supervision', 'reports_create'
+    ];
+    
+    const STUDENT_PERMISSIONS = [
+        'project_participation', 'task_management', 'file_upload'
+    ];
+    
+    public static function createAdmin(): Role {
+        return new Role('Admin', self::ADMIN_PERMISSIONS);
+    }
+    
+    public static function createSupervisor(): Role {
+        return new Role('Supervisor', self::SUPERVISOR_PERMISSIONS);
+    }
+    
+    public static function createStudent(): Role {
+        return new Role('Student', self::STUDENT_PERMISSIONS);
+    }
+    
+    public static function createCustomRole(string $name, array $permissions): Role {
+        return new Role($name, $permissions);
+    }
+}
+?>
